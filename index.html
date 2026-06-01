@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aegix — Pesquisa Rápida</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1208;
+      --paper: #faf7f2;
+      --cream: #f0ead8;
+      --gold: #b8860b;
+      --gold-light: #d4a017;
+      --muted: #7a6e5f;
+      --border: #d4c9b0;
+      --white: #ffffff;
+      --success: #2d6a4f;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      padding-bottom: 4rem;
+    }
+
+    /* HEADER */
+    .header {
+      background: var(--ink);
+      padding: 2rem 1.5rem 1.75rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 10px,
+        rgba(255,255,255,0.015) 10px,
+        rgba(255,255,255,0.015) 20px
+      );
+    }
+
+    .header-badge {
+      display: inline-block;
+      background: rgba(184,134,11,0.2);
+      border: 1px solid rgba(184,134,11,0.4);
+      color: var(--gold-light);
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      padding: 0.3rem 0.9rem;
+      border-radius: 2px;
+      margin-bottom: 1rem;
+    }
+
+    .header h1 {
+      font-family: 'Libre Baskerville', serif;
+      color: #fff;
+      font-size: 1.6rem;
+      font-weight: 700;
+      line-height: 1.3;
+      margin-bottom: 0.6rem;
+    }
+
+    .header h1 em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .header p {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.85rem;
+      line-height: 1.6;
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+    .header-time {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: 1rem;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.5);
+      font-size: 0.72rem;
+      padding: 0.3rem 0.8rem;
+      border-radius: 100px;
+    }
+
+    .time-dot {
+      width: 5px;
+      height: 5px;
+      background: var(--gold-light);
+      border-radius: 50%;
+      animation: blink 1.5s infinite;
+    }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    /* PROGRESS */
+    .progress-wrap {
+      background: var(--cream);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+
+    .progress-bar-bg {
+      background: var(--border);
+      height: 3px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    .progress-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+
+    /* FORM CONTAINER */
+    .form-wrap {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 0 1.25rem;
+    }
+
+    /* STEPS */
+    .step {
+      display: none;
+      animation: stepIn 0.35s ease both;
+    }
+
+    .step.active { display: block; }
+
+    @keyframes stepIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-header {
+      padding: 2rem 0 1.25rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+
+    .step-num {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.5rem;
+    }
+
+    .step-title {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.2rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--ink);
+    }
+
+    .step-sub {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      line-height: 1.5;
+    }
+
+    /* FIELD */
+    .field { margin-bottom: 1.25rem; }
+
+    .field label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 0.5rem;
+    }
+
+    .field label span {
+      color: var(--muted);
+      font-weight: 400;
+    }
+
+    input[type="text"],
+    input[type="tel"],
+    textarea,
+    select {
+      width: 100%;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 0.75rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      color: var(--ink);
+      outline: none;
+      transition: border-color 0.2s;
+      -webkit-appearance: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--gold);
+    }
+
+    textarea { min-height: 90px; resize: none; }
+
+    /* OPTIONS GRID */
+    .options {
+      display: grid;
+      gap: 0.6rem;
+    }
+
+    .options.cols-2 { grid-template-columns: 1fr 1fr; }
+
+    .option {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .option:active { transform: scale(0.98); }
+
+    .option.selected {
+      border-color: var(--gold);
+      background: #fef9ec;
+    }
+
+    .option-radio {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 1px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .option.selected .option-radio {
+      border-color: var(--gold);
+      background: var(--gold);
+    }
+
+    .option.selected .option-radio::after {
+      content: '';
+      width: 5px;
+      height: 5px;
+      background: white;
+      border-radius: 50%;
+    }
+
+    .option-text {
+      font-size: 0.875rem;
+      color: var(--ink);
+      line-height: 1.4;
+      font-weight: 500;
+    }
+
+    .option-sub {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 0.15rem;
+    }
+
+    /* SCALE */
+    .scale-wrap {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem;
+    }
+
+    .scale-options {
+      display: flex;
+      gap: 0.4rem;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+    }
+
+    .scale-btn {
+      flex: 1;
+      height: 44px;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      background: var(--paper);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .scale-btn:active { transform: scale(0.95); }
+    .scale-btn.selected {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: white;
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--muted);
+    }
+
+    /* PRICE SLIDER */
+    .price-display {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      margin-bottom: 0.75rem;
+    }
+
+    .price-val {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    .price-val span {
+      font-size: 1rem;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 400;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 4px;
+      background: var(--border);
+      border-radius: 2px;
+      outline: none;
+      border: none;
+      padding: 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 22px;
+      height: 22px;
+      background: var(--gold);
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+    }
+
+    .price-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+    }
+
+    /* CONTACT */
+    .contact-note {
+      background: #fef9ec;
+      border: 1px solid rgba(184,134,11,0.25);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.5;
+      margin-bottom: 1.25rem;
+    }
+
+    .contact-note strong { color: var(--ink); }
+
+    /* BUTTONS */
+    .btn-next {
+      width: 100%;
+      background: var(--ink);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 1rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+
+    .btn-next:hover { background: #2d2416; transform: translateY(-1px); }
+    .btn-next:active { transform: translateY(0); }
+    .btn-next:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+    .btn-back {
+      width: 100%;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: all 0.2s;
+    }
+
+    .btn-back:hover { color: var(--ink); border-color: var(--ink); }
+
+    /* ANALYSIS */
+    #analysis-section {
+      display: none;
+      padding: 2rem 1.25rem;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .analysis-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .analysis-header .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .analysis-header h2 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.3rem;
+      color: var(--ink);
+      margin-bottom: 0.4rem;
+    }
+
+    .analysis-header p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .analysis-box {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .analysis-box h3 {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.75rem;
+    }
+
+    .analysis-content {
+      font-size: 0.875rem;
+      color: var(--ink);
+      line-height: 1.7;
+      white-space: pre-wrap;
+    }
+
+    .analysis-loading {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .spinner {
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* THANK YOU */
+    #thankyou-section {
+      display: none;
+      padding: 3rem 1.25rem;
+      max-width: 480px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .thankyou-icon {
+      width: 64px;
+      height: 64px;
+      background: var(--ink);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+      font-size: 1.5rem;
+    }
+
+    #thankyou-section h2 {
+      font-family: 'Libre Baskerville', serif;
+      font-size: 1.4rem;
+      margin-bottom: 0.75rem;
+    }
+
+    #thankyou-section p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 300px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .thankyou-detail {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-align: left;
+      line-height: 1.6;
+    }
+
+    .tag-chip {
+      display: inline-block;
+      background: var(--cream);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.7rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 3px;
+      margin: 0.2rem;
+    }
+
+    /* ERROR */
+    .error-msg {
+      font-size: 0.75rem;
+      color: #c0392b;
+      margin-top: 0.4rem;
+      display: none;
+    }
+
+    /* LGPD CONSENT */
+    .lgpd-block {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .lgpd-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 0.6rem;
+    }
+
+    .lgpd-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 0.85rem;
+    }
+
+    .lgpd-text strong { color: var(--ink); }
+
+    .consent-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      cursor: pointer;
+      padding: 0.65rem 0.75rem;
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      transition: all 0.2s;
+      background: var(--paper);
+    }
+
+    .consent-row:hover { border-color: var(--gold); }
+    .consent-row.checked { border-color: var(--gold); background: #fef9ec; }
+
+    .consent-row input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      accent-color: var(--gold);
+      cursor: pointer;
+      border: none;
+      padding: 0;
+    }
+
+    .consent-label {
+      font-size: 0.8rem;
+      color: var(--ink);
+      line-height: 1.5;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    .consent-required {
+      font-size: 0.68rem;
+      color: #c0392b;
+      margin-top: 0.4rem;
+      display: none;
+    }
+
+    .lgpd-rights {
+      margin-top: 0.75rem;
+      font-size: 0.68rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .lgpd-rights a {
+      color: var(--gold);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-badge">Aegix — Pesquisa de produto</div>
+  <h1>Sua opinião vai<br><em>moldar o produto.</em></h1>
+  <p>Desenvolvido por quem passou pelo TJAM. Antes de construir, quero ouvir quem usa.</p>
+  <div class="header-time">
+    <span class="time-dot"></span>
+    Leva menos de 3 minutos
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div class="progress-wrap">
+  <div class="progress-bar-bg">
+    <div class="progress-bar-fill" id="progressBar"></div>
+  </div>
+  <div class="progress-label">
+    <span id="progressText">Pergunta 1 de 6</span>
+    <span id="progressPct">0%</span>
+  </div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap">
+
+  <!-- STEP 1: Perfil -->
+  <div class="step active" id="step-1">
+    <div class="step-header">
+      <div class="step-num">Pergunta 1 de 6</div>
+      <div class="step-title">Como é o seu escritório?</div>
+      <div class="step-sub">Sem compromisso, só quero entender o contexto.</div>
+    </div>
+
+    <div class="field">
+      <label>Quantos advogados atuam no escritório?</label>
+      <div class="options">
+        <div class="option" data-group="tamanho" data-val="solo" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">Só eu</div>
+            <div class="option-sub">Autônomo ou individual</div>
+          </div>
+        </div>
+        <div class="option" data-group="tamanho" data-val="2-3" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">2 a 3 advogados</div>
+            <div class="option-sub">Sociedade pequena</div>
+          </div>
+        </div>
+        <div class="option" data-group="tamanho" data-val="4-6" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">4 a 6 advogados</div>
+            <div class="option-sub">Escritório médio</div>
+          </div>
+        </div>
+        <div class="option" data-group="tamanho" data-val="7+" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">7 ou mais</div>
+            <div class="option-sub">Escritório maior</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Área principal de atuação <span>(opcional)</span></label>
+      <select id="area">
+        <option value="">Selecione...</option>
+        <option>Cível</option>
+        <option>Trabalhista</option>
+        <option>Criminal</option>
+        <option>Família e Sucessões</option>
+        <option>Tributário</option>
+        <option>Empresarial</option>
+        <option>Generalista</option>
+        <option>Outra</option>
+      </select>
+    </div>
+
+    <button class="btn-next" onclick="nextStep(1)" id="btn1" disabled>Continuar</button>
+  </div>
+
+  <!-- STEP 2: Dor -->
+  <div class="step" id="step-2">
+    <div class="step-header">
+      <div class="step-num">Pergunta 2 de 6</div>
+      <div class="step-title">Como você controla prazos e processos hoje?</div>
+      <div class="step-sub">Quero entender o que realmente acontece no dia a dia.</div>
+    </div>
+
+    <div class="field">
+      <label>Ferramenta principal que você usa</label>
+      <div class="options">
+        <div class="option" data-group="ferramenta" data-val="planilha" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">Planilha (Excel ou Google Sheets)</div>
+          </div>
+        </div>
+        <div class="option" data-group="ferramenta" data-val="papel" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">Agenda ou caderno físico</div>
+          </div>
+        </div>
+        <div class="option" data-group="ferramenta" data-val="whatsapp" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">WhatsApp ou anotações no celular</div>
+          </div>
+        </div>
+        <div class="option" data-group="ferramenta" data-val="software" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">Software jurídico (Projuris, Advbox, outro)</div>
+          </div>
+        </div>
+        <div class="option" data-group="ferramenta" data-val="nenhum" onclick="selectOption(this)">
+          <div class="option-radio"></div>
+          <div>
+            <div class="option-text">Não uso nenhuma ferramenta específica</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="nextStep(2)" id="btn2" disabled>Continuar</button>
+    <button class="btn-back" onclick="prevStep(2)">Voltar</button>
+  </div>
+
+  <!-- STEP 3: Problema real -->
+  <div class="step" id="step-3">
+    <div class="step-header">
+      <div class="step-num">Pergunta 3 de 6</div>
+      <div class="step-title">Qual é a maior dificuldade na gestão do seu escritório?</div>
+      <div class="step-sub">Pode marcar mais de uma.</div>
+    </div>
+
+    <div class="field">
+      <div class="options" id="dores-options">
+        <div class="option multi" data-val="prazos" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Controle de prazos processuais</div>
+            <div class="option-sub">Risco de perder datas importantes</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="processos" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Organização de processos e clientes</div>
+            <div class="option-sub">Difícil encontrar informação rápida</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="honorarios" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Controle de honorários e pagamentos</div>
+            <div class="option-sub">Gestão financeira do escritório</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="documentos" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Gestão de documentos e petições</div>
+            <div class="option-sub">Organização do acervo documental</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="tempo" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Tempo gasto em tarefas administrativas</div>
+            <div class="option-sub">Muito tempo em burocracia, pouco em advocacia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="nextStep(3)" id="btn3" disabled>Continuar</button>
+    <button class="btn-back" onclick="prevStep(3)">Voltar</button>
+  </div>
+
+  <!-- STEP 4: Abertura para solução -->
+  <div class="step" id="step-4">
+    <div class="step-header">
+      <div class="step-num">Pergunta 4 de 6</div>
+      <div class="step-title">O quanto isso te incomoda no dia a dia?</div>
+      <div class="step-sub">Seja honesto. Isso vai definir se vale construir ou não.</div>
+    </div>
+
+    <div class="field">
+      <label>Nível de incômodo com a gestão atual</label>
+      <div class="scale-wrap">
+        <div class="scale-options" id="scale-incomodo">
+          <button class="scale-btn" data-val="1" onclick="selectScale('incomodo',this)">1</button>
+          <button class="scale-btn" data-val="2" onclick="selectScale('incomodo',this)">2</button>
+          <button class="scale-btn" data-val="3" onclick="selectScale('incomodo',this)">3</button>
+          <button class="scale-btn" data-val="4" onclick="selectScale('incomodo',this)">4</button>
+          <button class="scale-btn" data-val="5" onclick="selectScale('incomodo',this)">5</button>
+        </div>
+        <div class="scale-labels">
+          <span>Não me incomoda</span>
+          <span>Incomoda muito</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label>Você pagaria por uma ferramenta que resolvesse isso? <span>(por mês)</span></label>
+      <div class="price-display">
+        <div class="price-val">R$ <span id="priceVal">79</span><span>/mês</span></div>
+      </div>
+      <input type="range" min="0" max="200" step="10" value="79" id="priceSlider"
+        oninput="document.getElementById('priceVal').textContent = this.value == 0 ? '0 (não pagaria)' : this.value"/>
+      <div class="price-labels">
+        <span>Não pagaria</span>
+        <span>R$ 200+</span>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="nextStep(4)" id="btn4" disabled>Continuar</button>
+    <button class="btn-back" onclick="prevStep(4)">Voltar</button>
+  </div>
+
+  <!-- STEP 5: Funcionalidades -->
+  <div class="step" id="step-5">
+    <div class="step-header">
+      <div class="step-num">Pergunta 5 de 6</div>
+      <div class="step-title">O que seria indispensável numa ferramenta assim?</div>
+      <div class="step-sub">Marque o que você realmente usaria, não o que parece legal.</div>
+    </div>
+
+    <div class="field">
+      <div class="options" id="features-options">
+        <div class="option multi" data-val="alertas_email" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Alertas de prazo por e-mail ou WhatsApp</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="dashboard" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Painel com visão geral dos processos</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="clientes" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Cadastro de clientes e histórico</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="relatorios" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Relatórios exportáveis em PDF</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="honorarios_f" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Controle de honorários e recebimentos</div>
+          </div>
+        </div>
+        <div class="option multi" data-val="mobile" onclick="toggleMulti(this)">
+          <div class="option-radio" style="border-radius:4px;"></div>
+          <div>
+            <div class="option-text">Funcionar bem no celular</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="nextStep(5)" id="btn5" disabled>Continuar</button>
+    <button class="btn-back" onclick="prevStep(5)">Voltar</button>
+  </div>
+
+  <!-- STEP 6: Contato -->
+  <div class="step" id="step-6">
+    <div class="step-header">
+      <div class="step-num">Pergunta 6 de 6</div>
+      <div class="step-title">Posso te enviar o resultado quando o produto estiver pronto?</div>
+      <div class="step-sub">Completamente opcional. Não vai receber spam.</div>
+    </div>
+
+    <div class="contact-note">
+      <strong>Por que pedir isso?</strong> Se você chegou até aqui, provavelmente tem interesse real. Quero te avisar quando o teste grátis abrir, antes de qualquer lançamento público.
+    </div>
+
+    <div class="field">
+      <label>Nome <span>(opcional)</span></label>
+      <input type="text" id="nome" placeholder="Dr. João Silva"/>
+    </div>
+
+    <div class="field">
+      <label>WhatsApp ou e-mail <span>(opcional)</span></label>
+      <input type="tel" id="contato" placeholder="(92) 9 9999-9999 ou email@..."/>
+    </div>
+
+    <div class="field">
+      <label>Quer adicionar algo? <span>(opcional)</span></label>
+      <p style="font-size:0.78rem; color:var(--muted); margin-bottom:0.6rem; line-height:1.5;">
+        Pode escrever à vontade: uma dificuldade do dia a dia, algo que já tentou usar e não funcionou, 
+        uma funcionalidade que faria diferença, qualquer coisa. Essa parte é a mais valiosa da pesquisa.
+      </p>
+      <textarea id="comentario" style="min-height:120px;" placeholder="Ex: Perco muito tempo procurando processos de clientes antigos. Já tentei o Excel mas fica uma bagunça quando tem muitos arquivos..."></textarea>
+    </div>
+
+    <!-- LGPD CONSENT -->
+    <div class="lgpd-block">
+      <div class="lgpd-title">Proteção de dados — LGPD</div>
+      <p class="lgpd-text">
+        Suas respostas serão usadas <strong>exclusivamente para pesquisa de produto</strong> pelo Aegix.
+        Não serão vendidas, compartilhadas com terceiros nem usadas para fins comerciais sem seu consentimento.
+        Você pode solicitar a exclusão dos seus dados a qualquer momento pelo e-mail
+        <strong>atendimento@aegix.app.com</strong>.
+      </p>
+
+      <label class="consent-row" id="consentRow" onclick="toggleConsent()">
+        <input type="checkbox" id="consentCheck" onclick="event.stopPropagation(); toggleConsent()"/>
+        <span class="consent-label">
+          Li e concordo com o uso dos meus dados para fins de pesquisa de produto,
+          conforme descrito acima e em conformidade com a Lei 13.709/2018 (LGPD).
+        </span>
+      </label>
+
+      <div class="consent-required" id="consentRequired">
+        É necessário aceitar para enviar a pesquisa.
+      </div>
+
+      <div class="lgpd-rights">
+        Você tem direito de acessar, corrigir ou solicitar a exclusão dos seus dados a qualquer momento.
+        Base legal: consentimento (Art. 7º, I da LGPD).
+      </div>
+    </div>
+
+    <button class="btn-next" onclick="submitForm()" id="btn6">Enviar e ver análise</button>
+    <button class="btn-back" onclick="prevStep(6)">Voltar</button>
+  </div>
+
+</div>
+
+<!-- ANALYSIS SECTION -->
+<div id="analysis-section">
+  <div class="analysis-header">
+    <div class="icon">⚖️</div>
+    <h2>Obrigado pela resposta</h2>
+    <p>Analisando seu perfil com base nas respostas...</p>
+  </div>
+
+  <div class="analysis-box">
+    <h3>Análise do seu perfil</h3>
+    <div class="analysis-content" id="analysisText">
+      <div class="analysis-loading">
+        <div class="spinner"></div>
+        Gerando análise personalizada...
+      </div>
+    </div>
+  </div>
+
+  <div class="analysis-box" id="suggestBox" style="display:none;">
+    <h3>Funcionalidades que fazem sentido para você</h3>
+    <div id="suggestContent" class="analysis-content"></div>
+  </div>
+</div>
+
+<!-- THANK YOU -->
+<div id="thankyou-section">
+  <div class="thankyou-icon">✓</div>
+  <h2>Resposta registrada.</h2>
+  <p>Sua opinião vai diretamente para a definição do produto. Quando o beta abrir, você será um dos primeiros a saber.</p>
+  <div class="thankyou-detail" id="thankyouDetail"></div>
+</div>
+
+<script>
+  // STATE
+  const data = {
+    tamanho: null,
+    area: '',
+    ferramenta: null,
+    dores: [],
+    incomodo: null,
+    preco: 79,
+    features: [],
+    nome: '',
+    contato: '',
+    comentario: ''
+  };
+
+  let currentStep = 1;
+  const totalSteps = 6;
+
+  // SINGLE SELECT
+  function selectOption(el) {
+    const group = el.dataset.group;
+    document.querySelectorAll(`.option[data-group="${group}"]`).forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    data[group] = el.dataset.val;
+
+    const btnId = 'btn' + currentStep;
+    checkStepValidity(currentStep);
+  }
+
+  // MULTI SELECT
+  function toggleMulti(el) {
+    el.classList.toggle('selected');
+    const parent = el.closest('[id$="-options"]');
+    const selected = parent ? [...parent.querySelectorAll('.option.selected')].map(o => o.dataset.val) : [];
+
+    if (parent && parent.id === 'dores-options') {
+      data.dores = selected;
+      document.getElementById('btn3').disabled = data.dores.length === 0;
+    } else if (parent && parent.id === 'features-options') {
+      data.features = selected;
+      document.getElementById('btn5').disabled = data.features.length === 0;
+    }
+  }
+
+  // SCALE
+  function selectScale(name, btn) {
+    const container = document.getElementById('scale-' + name);
+    container.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    data[name] = parseInt(btn.dataset.val);
+    checkStepValidity(currentStep);
+  }
+
+  // VALIDITY
+  function checkStepValidity(step) {
+    let valid = false;
+    if (step === 1) valid = !!data.tamanho;
+    if (step === 2) valid = !!data.ferramenta;
+    if (step === 3) valid = data.dores.length > 0;
+    if (step === 4) valid = data.incomodo !== null;
+    if (step === 5) valid = data.features.length > 0;
+    if (step === 6) valid = true;
+
+    const btn = document.getElementById('btn' + step);
+    if (btn) btn.disabled = !valid;
+  }
+
+  // NAVIGATION
+  function nextStep(from) {
+    if (from === 4) data.preco = parseInt(document.getElementById('priceSlider').value);
+
+    document.getElementById('step-' + from).classList.remove('active');
+    const next = from + 1;
+    document.getElementById('step-' + next).classList.add('active');
+    currentStep = next;
+    updateProgress(next);
+    checkStepValidity(next);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prevStep(from) {
+    document.getElementById('step-' + from).classList.remove('active');
+    const prev = from - 1;
+    document.getElementById('step-' + prev).classList.add('active');
+    currentStep = prev;
+    updateProgress(prev);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateProgress(step) {
+    const pct = Math.round(((step - 1) / totalSteps) * 100);
+    document.getElementById('progressBar').style.width = pct + '%';
+    document.getElementById('progressText').textContent = `Pergunta ${step} de ${totalSteps}`;
+    document.getElementById('progressPct').textContent = pct + '%';
+  }
+
+  // LGPD CONSENT
+  function toggleConsent() {
+    const check = document.getElementById('consentCheck');
+    const row = document.getElementById('consentRow');
+    const required = document.getElementById('consentRequired');
+
+    // Toggle checkbox state
+    check.checked = !check.checked;
+    row.classList.toggle('checked', check.checked);
+    required.style.display = 'none';
+  }
+
+  // SUBMIT
+  async function submitForm() {
+    // Validar consentimento LGPD antes de qualquer coisa
+    const consentCheck = document.getElementById('consentCheck');
+    if (!consentCheck.checked) {
+      document.getElementById('consentRequired').style.display = 'block';
+      document.getElementById('consentRow').style.borderColor = '#c0392b';
+      document.getElementById('consentRow').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    data.area = document.getElementById('area').value;
+    data.nome = document.getElementById('nome').value;
+    data.contato = document.getElementById('contato').value;
+    data.comentario = document.getElementById('comentario').value;
+    data.preco = parseInt(document.getElementById('priceSlider').value);
+    data.consentimento = true;
+    data.consentimento_data = new Date().toISOString();
+
+    document.getElementById('step-6').classList.remove('active');
+    document.querySelector('.progress-wrap').style.display = 'none';
+    document.getElementById('analysis-section').style.display = 'block';
+
+    const progressBar = document.getElementById('progressBar');
+    progressBar.style.width = '100%';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    await generateAnalysis();
+  }
+
+  // IA ANALYSIS
+  async function generateAnalysis() {
+    const doresLabels = {
+      prazos: 'controle de prazos processuais',
+      processos: 'organização de processos e clientes',
+      honorarios: 'controle de honorários',
+      documentos: 'gestão de documentos',
+      tempo: 'tempo em tarefas administrativas'
+    };
+
+    const featuresLabels = {
+      alertas_email: 'alertas por e-mail/WhatsApp',
+      dashboard: 'painel visual de processos',
+      clientes: 'cadastro de clientes',
+      relatorios: 'relatórios em PDF',
+      honorarios_f: 'controle de honorários',
+      mobile: 'uso pelo celular'
+    };
+
+    const doresTexto = data.dores.map(d => doresLabels[d] || d).join(', ');
+    const featuresTexto = data.features.map(f => featuresLabels[f] || f).join(', ');
+
+    const tamanhoTexto = {
+      solo: 'advogado autônomo',
+      '2-3': 'escritório com 2 a 3 advogados',
+      '4-6': 'escritório com 4 a 6 advogados',
+      '7+': 'escritório maior com 7 ou mais advogados'
+    }[data.tamanho] || data.tamanho;
+
+    const prompt = `Você é um analista de produto especializado em LegalTech no Brasil. Analise as respostas de um advogado em pesquisa de validação de mercado para um SaaS jurídico chamado Aegix.
+
+Dados do respondente:
+- Perfil: ${tamanhoTexto}
+- Área: ${data.area || 'não informada'}
+- Ferramenta atual: ${data.ferramenta}
+- Principais dores: ${doresTexto}
+- Nível de incômodo (1 a 5): ${data.incomodo}
+- Valor que pagaria por mês: R$ ${data.preco}
+- Funcionalidades desejadas: ${featuresTexto}
+${data.comentario ? '- Comentário livre: ' + data.comentario : ''}
+
+Escreva uma análise personalizada de 3 parágrafos curtos, diretamente para esse advogado (usando "você"), em português brasileiro formal mas acessível. Cubra:
+1. O que as respostas dele revelam sobre a dor real que ele enfrenta
+2. Se o Aegix (foco em prazos, clientes e processos simples, R$ 59 a R$ 119/mês) faz sentido para o perfil dele
+3. Uma expectativa realista de quanto tempo/trabalho ele economizaria
+
+Seja direto, sem exageros e sem prometer milagres. Máximo 150 palavras no total.`;
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role: 'user', content: prompt }]
+        })
+      });
+
+      const result = await response.json();
+      const text = result.content?.[0]?.text || '';
+
+      document.getElementById('analysisText').textContent = text;
+
+      // Sugestão de features
+      const suggestEl = document.getElementById('suggestBox');
+      const suggestContent = document.getElementById('suggestContent');
+
+      const priorityMap = {
+        prazos: ['alertas_email', 'dashboard'],
+        honorarios: ['honorarios_f', 'relatorios'],
+        processos: ['clientes', 'dashboard'],
+        documentos: ['relatorios', 'clientes'],
+        tempo: ['dashboard', 'alertas_email']
+      };
+
+      const suggested = new Set();
+      data.dores.forEach(d => {
+        (priorityMap[d] || []).forEach(f => suggested.add(f));
+      });
+      data.features.forEach(f => suggested.add(f));
+
+      const fLabels = {
+        alertas_email: 'Alertas automáticos de prazo',
+        dashboard: 'Painel de visão geral',
+        clientes: 'Gestão de clientes',
+        relatorios: 'Relatórios exportáveis',
+        honorarios_f: 'Controle de honorários',
+        mobile: 'Interface otimizada para celular'
+      };
+
+      suggestContent.innerHTML = [...suggested].map(f =>
+        `<span class="tag-chip">${fLabels[f] || f}</span>`
+      ).join('');
+
+      suggestEl.style.display = 'block';
+
+    } catch (err) {
+      document.getElementById('analysisText').textContent =
+        'Obrigado pelas respostas. Sua contribuição foi registrada e vai diretamente para a definição do produto.';
+    }
+
+    // Show thank you after a moment
+    setTimeout(() => {
+      document.getElementById('analysis-section').style.display = 'none';
+      showThankYou();
+    }, 6000);
+  }
+
+  function showThankYou() {
+    document.getElementById('thankyou-section').style.display = 'block';
+
+    const detail = document.getElementById('thankyouDetail');
+    const tamanhoTexto = {
+      solo: 'Advogado autônomo',
+      '2-3': '2 a 3 advogados',
+      '4-6': '4 a 6 advogados',
+      '7+': '7 ou mais advogados'
+    }[data.tamanho] || '';
+
+    detail.innerHTML = `
+      <div style="font-size:0.75rem; color:var(--muted); line-height:1.8;">
+        <strong style="color:var(--ink);">Resumo do que você informou:</strong><br>
+        Perfil: ${tamanhoTexto} · Ferramenta atual: ${data.ferramenta} · Incômodo: ${data.incomodo}/5<br>
+        ${data.nome ? 'Nome: ' + data.nome + '<br>' : ''}
+        ${data.contato ? 'Contato: ' + data.contato + '<br>' : 'Contato não informado<br>'}
+        <span style="color: var(--success); font-size: 0.68rem;">
+          ✓ Consentimento LGPD registrado em ${new Date().toLocaleDateString('pt-BR')}
+        </span>
+      </div>
+    `;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // INIT
+  checkStepValidity(1);
+  updateProgress(1);
+
+  // Enable btn6 always (all fields optional)
+  document.getElementById('btn6').disabled = false;
+</script>
+</body>
+</html>

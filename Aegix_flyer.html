@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Aegix — Flyer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #e8e0d0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      font-family: 'DM Sans', sans-serif;
+      gap: 1.5rem;
+    }
+
+    /* CONTROLS */
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .ctrl-btn {
+      background: #1a1208;
+      color: #fff;
+      border: none;
+      padding: 0.5rem 1.25rem;
+      border-radius: 6px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .ctrl-btn:hover { opacity: 0.8; }
+    .ctrl-btn.ghost {
+      background: transparent;
+      border: 1.5px solid #1a1208;
+      color: #1a1208;
+    }
+
+    /* CARD */
+    .card {
+      width: 105mm;
+      background: #faf7f2;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18), 0 2px 8px rgba(0,0,0,0.1);
+      position: relative;
+    }
+
+    /* TOP BAR */
+    .top-bar {
+      background: #1a1208;
+      padding: 1.1rem 1.4rem 1rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top-bar::after {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #b8860b, #d4a017, #b8860b);
+    }
+
+    .top-bar::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 100px; height: 100px;
+      border: 20px solid rgba(255,255,255,0.03);
+      border-radius: 50%;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .brand-icon {
+      width: 22px; height: 22px;
+      background: linear-gradient(135deg, #b8860b, #d4a017);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+
+    .brand-name {
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-name span { color: #d4a017; }
+
+    .headline {
+      font-family: 'Libre Baskerville', serif;
+      color: #fff;
+      font-size: 1.05rem;
+      line-height: 1.35;
+      font-weight: 700;
+    }
+
+    .headline em {
+      font-style: italic;
+      color: #d4a017;
+    }
+
+    /* BODY */
+    .card-body {
+      padding: 1.1rem 1.4rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    /* LEFT */
+    .left { flex: 1; }
+
+    .intro-text {
+      font-size: 0.72rem;
+      color: #5a4f3f;
+      line-height: 1.6;
+      margin-bottom: 0.9rem;
+    }
+
+    .intro-text strong { color: #1a1208; }
+
+    .points {
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .point {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.45rem;
+      font-size: 0.7rem;
+      color: #3d3020;
+      line-height: 1.4;
+    }
+
+    .point-dot {
+      width: 4px; height: 4px;
+      background: #b8860b;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 5px;
+    }
+
+    .reward {
+      background: #f0ead8;
+      border: 1px solid #d4c9b0;
+      border-left: 3px solid #b8860b;
+      border-radius: 3px;
+      padding: 0.5rem 0.65rem;
+      font-size: 0.66rem;
+      color: #5a4f3f;
+      line-height: 1.5;
+    }
+
+    .reward strong { color: #1a1208; font-size: 0.7rem; }
+
+    /* RIGHT - QR */
+    .right {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .qr-box {
+      width: 68px; height: 68px;
+      border: 2px solid #d4c9b0;
+      border-radius: 6px;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* QR placeholder pattern */
+    .qr-placeholder {
+      width: 54px; height: 54px;
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 1px;
+    }
+
+    .qr-placeholder .qc {
+      background: #d4c9b0;
+      border-radius: 0.5px;
+    }
+
+    .qr-placeholder .qb { background: #1a1208; border-radius: 0.5px; }
+    .qr-placeholder .qw { background: transparent; }
+
+    .qr-label {
+      font-size: 0.55rem;
+      color: #7a6e5f;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* FOOTER */
+    .card-footer {
+      background: #f0ead8;
+      border-top: 1px solid #d4c9b0;
+      padding: 0.6rem 1.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer-left {
+      font-size: 0.62rem;
+      color: #7a6e5f;
+      line-height: 1.5;
+    }
+
+    .footer-left strong { color: #1a1208; font-size: 0.65rem; }
+
+    .footer-time {
+      background: #1a1208;
+      color: #d4a017;
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.6rem;
+      border-radius: 2px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    /* PRINT STYLES */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+        margin: 0;
+      }
+
+      .controls, .print-note { display: none !important; }
+
+      .card {
+        box-shadow: none;
+        border: 0.5pt solid #ccc;
+        page-break-inside: avoid;
+      }
+    }
+
+    .print-note {
+      font-size: 0.75rem;
+      color: #7a6e5f;
+      text-align: center;
+      max-width: 400px;
+      line-height: 1.6;
+    }
+
+    .print-note strong { color: #1a1208; }
+  </style>
+</head>
+<body>
+
+  <div class="controls">
+    <button class="ctrl-btn" onclick="window.print()">Imprimir / Salvar PDF</button>
+    <button class="ctrl-btn ghost" onclick="document.querySelector('.card').style.width='148mm'">Tamanho A6</button>
+    <button class="ctrl-btn ghost" onclick="document.querySelector('.card').style.width='105mm'">Tamanho A7</button>
+  </div>
+
+  <!-- CARD -->
+  <div class="card" id="flyer">
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+      <div class="brand">
+        <div class="brand-icon">⚖</div>
+        <div class="brand-name">Aegix</div>
+      </div>
+      <div class="headline">
+        Você perde tempo<br>organizando o que<br>deveria ser <em>automático?</em>
+      </div>
+    </div>
+
+    <!-- BODY -->
+    <div class="card-body">
+      <div class="left">
+        <p class="intro-text">
+          Estou desenvolvendo uma ferramenta de gestão jurídica simples para 
+          <strong>escritórios pequenos em Manaus.</strong>
+          Antes de construir, quero ouvir quem vai usar.
+        </p>
+
+        <div class="points">
+          <div class="point">
+            <div class="point-dot"></div>
+            <span>Controle de prazos com alertas automáticos</span>
+          </div>
+          <div class="point">
+            <div class="point-dot"></div>
+            <span>Painel de processos e clientes em um só lugar</span>
+          </div>
+          <div class="point">
+            <div class="point-dot"></div>
+            <span>Simples o suficiente para usar sem treinamento</span>
+          </div>
+          <div class="point">
+            <div class="point-dot"></div>
+            <span>Preço pensado para escritórios pequenos</span>
+          </div>
+        </div>
+
+        <div class="reward">
+          <strong>Responda a pesquisa e ganhe acesso antecipado.</strong><br>
+          Quem participar agora entra no beta antes do lançamento, com 30 dias grátis.
+        </div>
+      </div>
+
+      <!-- QR CODE -->
+      <div class="right">
+        <div class="qr-box">
+          <!-- SUBSTITUA ESTE BLOCO PELO SEU QR CODE GERADO -->
+          <!-- Use qr-code-generator.com ou similar, cole a imagem aqui -->
+          <!-- Exemplo: <img src="qrcode.png" width="64" height="64"/> -->
+          <svg viewBox="0 0 7 7" width="54" height="54" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+            <!-- Top-left finder -->
+            <rect x="0" y="0" width="3" height="3" fill="#1a1208"/>
+            <rect x="1" y="1" width="1" height="1" fill="#faf7f2"/>
+            <!-- Top-right finder -->
+            <rect x="4" y="0" width="3" height="3" fill="#1a1208"/>
+            <rect x="5" y="1" width="1" height="1" fill="#faf7f2"/>
+            <!-- Bottom-left finder -->
+            <rect x="0" y="4" width="3" height="3" fill="#1a1208"/>
+            <rect x="1" y="5" width="1" height="1" fill="#faf7f2"/>
+            <!-- Data pattern suggestion -->
+            <rect x="4" y="3" width="1" height="1" fill="#1a1208"/>
+            <rect x="6" y="3" width="1" height="1" fill="#1a1208"/>
+            <rect x="3" y="4" width="1" height="1" fill="#1a1208"/>
+            <rect x="5" y="4" width="1" height="1" fill="#1a1208"/>
+            <rect x="4" y="5" width="1" height="1" fill="#1a1208"/>
+            <rect x="3" y="6" width="1" height="1" fill="#1a1208"/>
+            <rect x="5" y="6" width="1" height="1" fill="#1a1208"/>
+            <rect x="6" y="6" width="1" height="1" fill="#1a1208"/>
+            <rect x="3" y="3" width="1" height="1" fill="#1a1208"/>
+          </svg>
+        </div>
+        <div class="qr-label">Escaneie<br>e responda</div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="card-footer">
+      <div class="footer-left">
+        <strong>Adriano Selis</strong><br>
+        Eng. de Software · Direito · Ex-TJAM
+      </div>
+      <div class="footer-time">3 minutos</div>
+    </div>
+
+  </div>
+
+  <p class="print-note">
+    <strong>Como usar:</strong> publique o formulário (GitHub Pages ou Vercel), gere o QR code em 
+    <strong>qr-code-generator.com</strong> com a URL, substitua o símbolo no centro pelo QR real 
+    e imprima em papel couchê A7 (74×105mm) ou A6 (105×148mm).
+  </p>
+
+</body>
+</html>
