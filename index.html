@@ -1159,6 +1159,48 @@
   }
 
   // SUBMIT
+
+  // SUPABASE CONFIG
+  const SUPABASE_URL = 'https://hcsngycrwoyxhgqvshjz.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_4Xo98IHwNbbYfiODZZP7Pw_pxlVL9Ed';
+
+  async function salvarResposta() {
+    try {
+      const payload = {
+        tamanho: data.tamanho,
+        area: data.area || null,
+        ferramenta: data.ferramenta,
+        dores: data.dores,
+        incomodo: data.incomodo,
+        preco: data.preco,
+        features: data.features,
+        nome: data.nome || null,
+        contato: data.contato || null,
+        comentario: data.comentario || null,
+        consentimento: data.consentimento,
+        consentimento_data: data.consentimento_data
+      };
+      const res = await fetch(SUPABASE_URL + '/rest/v1/respostas', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY,
+          'Prefer': 'return=minimal'
+        },
+        body: JSON.stringify(payload)
+      });
+      if (!res.ok) {
+        const err = await res.text();
+        console.error('Supabase error:', res.status, err);
+      } else {
+        console.log('Resposta salva no Supabase com sucesso.');
+      }
+    } catch(e) {
+      console.error('Erro ao salvar no Supabase:', e);
+    }
+  }
+
   async function submitForm() {
     // Validar consentimento LGPD antes de qualquer coisa
     const consentCheck = document.getElementById('consentCheck');
@@ -1185,6 +1227,7 @@
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    salvarResposta();
     await generateAnalysis();
   }
 
